@@ -10,16 +10,16 @@ app.config['MYSQL_PASSWORD'] = os.environ['MYSQL_PASSWORD']
 app.config['MYSQL_HOST'] = os.environ['MYSQL_HOST']
 app.config['MYSQL_DB'] = os.environ['MYSQL_DB']
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
-
 mysql = MySQL(app)
+
 
 @app.route('/create-table')
 def create_table():
     cursor = mysql.connection.cursor()
-    cursor.execute(''' CREATE TABLE IF NOT EXISTS cars (id INT NOT NULL AUTO INCREMENT PRIMARY KEY,
+    cursor.execute(''' CREATE TABLE IF NOT EXISTS cars (id INT NOT NULL AUTO_INCREMENT,
                                                         brand VARCHAR(50) NOT NULL,
                                                         model VARCHAR(50) NOT NULL,
-                                                        year INT NOT NULL) ''')
+                                                        year INT NOT NULL, PRIMARY KEY (id)) ''')
     mysql.connection.commit()
     cursor.close()
     return 'Tabla cars creada', 201
