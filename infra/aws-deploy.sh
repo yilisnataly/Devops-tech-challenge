@@ -33,14 +33,6 @@ case "$1" in
       --query 'taskDefinition.taskDefinitionArn' \
       --output text) || { echo "Error registrando la task definition"; exit 1; }
 
-    # Limpiar ARN de saltos de línea
-    #ECS_TASK_DEFINITION_ARN=$(echo "$ECS_TASK_DEFINITION_ARN" | tr -d '\n' | tr -d '\r')
-    #echo "Task definition registrada: $ECS_TASK_DEFINITION_ARN"
-
-    # Esperar propagación
-    #echo "Esperando 5 segundos para propagación de la task definition..."
-    #sleep 5
-
     NETWORK_CONFIG="awsvpcConfiguration={subnets=[${AWS_SUBNETS}],securityGroups=[${AWS_SECURITY_GROUPS}],assignPublicIp=ENABLED}"
 
     echo " Verificar servicio ECS"
