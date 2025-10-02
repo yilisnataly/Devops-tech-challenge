@@ -1,0 +1,41 @@
+{
+  "family": "cars-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::124678637394:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::124678637394:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "cars-api",
+      "image": "124678637394.dkr.ecr.eu-south-2.amazonaws.com/cars-api:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 5000,
+          "protocol": "tcp"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "MYSQL_HOST",
+          "valueFrom": "arn:aws:secretsmanager:eu-south-2:124678637394:secret:carsdb/credentials:MYSQL_HOST::"
+        },
+        {
+          "name": "MYSQL_USER",
+          "valueFrom": "arn:aws:secretsmanager:eu-south-2:124678637394:secret:carsdb/credentials:MYSQL_USER::"
+        },
+        {
+          "name": "MYSQL_PASSWORD",
+          "valueFrom": "arn:aws:secretsmanager:eu-south-2:124678637394:secret:carsdb/credentials:MYSQL_PASSWORD::"
+        },
+        {
+          "name": "MYSQL_DB",
+          "valueFrom": "arn:aws:secretsmanager:eu-south-2:124678637394:secret:carsdb/credentials:MYSQL_DB::"
+        }
+      ]
+    }
+  ]
+}
+
