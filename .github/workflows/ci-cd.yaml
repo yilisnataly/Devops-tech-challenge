@@ -11,6 +11,8 @@ env:
   CLUSTER_NAME: ${{ secrets.CLUSTER_NAME }}
   SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
   ECS_TASK_DEFINITION: ${{ secrets.ECS_TASK_DEFINITION }}
+  AWS_SUBNETS: ${{ secrets.AWS_SUBNETS }}
+  AWS_SECURITY_GROUPS: ${{ secrets.AWS_SECURITY_GROUPS }}
 
 jobs:
   build-and-deploy:
