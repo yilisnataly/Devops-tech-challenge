@@ -9,10 +9,10 @@ AWS_SUBNETS=${AWS_SUBNETS}
 AWS_SECURITY_GROUPS=${AWS_SECURITY_GROUPS}
 
 # Validación de secrets
-if [ -z "$AWS_SUBNETS" ] || [ -z "$AWS_SECURITY_GROUPS" ]; then
-  echo "ERROR: Debes definir AWS_SUBNETS y AWS_SECURITY_GROUPS como secrets en GitHub"
-  exit 1
-fi
+#if [ -z "$AWS_SUBNETS" ] || [ -z "$AWS_SECURITY_GROUPS" ]; then
+#  echo "ERROR: Debes definir AWS_SUBNETS y AWS_SECURITY_GROUPS como secrets en GitHub"
+#  exit 1
+#fi
 
 # Limpiar posibles espacios y comillas
 AWS_SUBNETS=$(echo "$AWS_SUBNETS" | tr -d '[:space:]' | tr -d '"' | tr -d '\n' | tr -d '\r')
@@ -51,20 +51,7 @@ case "$1" in
     echo "Esperando 5 segundos para propagación de la task definition..."
     sleep 5
 
-    # Generar NETWORK_CONFIG válido incluso con un solo subnet/SG
-    #NETWORK_CONFIG=$(jq -n \
-    #  --arg subnet "$AWS_SUBNETS" \
-    #  --arg sg "$AWS_SECURITY_GROUPS" \
-    #  '{awsvpcConfiguration: {subnets: [$subnet], securityGroups: [$sg], assignPublicIp: "ENABLED"}}')
     NETWORK_CONFIG="awsvpcConfiguration={subnets=[${AWS_SUBNETS}],securityGroups=[${AWS_SECURITY_GROUPS}],assignPublicIp=ENABLED}"
-
-    #echo "Generar NETWORK_CONFIG seguro con jq"
-    #SUBNETS_JSON=$(jq -R -s -c 'split(",")' <<< "$AWS_SUBNETS")
-    #SG_JSON=$(jq -R -s -c 'split(",")' <<< "$AWS_SECURITY_GROUPS")
-    #NETWORK_CONFIG=$(jq -n \
-    #  --argjson subnets "$SUBNETS_JSON" \
-    #  --argjson sgs "$SG_JSON" \
-    #  '{awsvpcConfiguration: {subnets: $subnets, securityGroups: $sgs, assignPublicIp: "ENABLED"}}')
 
     # Verificar servicio ECS
     SERVICE_STATUS=$(aws ecs describe-services \
