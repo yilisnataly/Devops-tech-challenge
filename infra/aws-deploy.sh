@@ -8,15 +8,9 @@ ECS_TASK_DEFINITION=${ECS_TASK_DEFINITION}
 AWS_SUBNETS=${AWS_SUBNETS}
 AWS_SECURITY_GROUPS=${AWS_SECURITY_GROUPS}
 
-# Validación de secrets
-#if [ -z "$AWS_SUBNETS" ] || [ -z "$AWS_SECURITY_GROUPS" ]; then
-#  echo "ERROR: Debes definir AWS_SUBNETS y AWS_SECURITY_GROUPS como secrets en GitHub"
-#  exit 1
-#fi
-
 # Limpiar posibles espacios y comillas
-AWS_SUBNETS=$(echo "$AWS_SUBNETS" | tr -d '[:space:]' | tr -d '"' | tr -d '\n' | tr -d '\r')
-AWS_SECURITY_GROUPS=$(echo "$AWS_SECURITY_GROUPS" | tr -d '[:space:]' | tr -d '"' | tr -d '\n' | tr -d '\r')
+#AWS_SUBNETS=$(echo "$AWS_SUBNETS" | tr -d '[:space:]' | tr -d '"' | tr -d '\n' | tr -d '\r')
+#AWS_SECURITY_GROUPS=$(echo "$AWS_SECURITY_GROUPS" | tr -d '[:space:]' | tr -d '"' | tr -d '\n' | tr -d '\r')
 
 case "$1" in
   setup)
