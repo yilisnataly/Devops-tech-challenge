@@ -52,10 +52,11 @@ case "$1" in
     sleep 5
 
     # Generar NETWORK_CONFIG válido incluso con un solo subnet/SG
-    NETWORK_CONFIG=$(jq -n \
-      --arg subnet "$AWS_SUBNETS" \
-      --arg sg "$AWS_SECURITY_GROUPS" \
-      '{awsvpcConfiguration: {subnets: [$subnet], securityGroups: [$sg], assignPublicIp: "ENABLED"}}')
+    #NETWORK_CONFIG=$(jq -n \
+    #  --arg subnet "$AWS_SUBNETS" \
+    #  --arg sg "$AWS_SECURITY_GROUPS" \
+    #  '{awsvpcConfiguration: {subnets: [$subnet], securityGroups: [$sg], assignPublicIp: "ENABLED"}}')
+    NETWORK_CONFIG="awsvpcConfiguration={subnets=[${AWS_SUBNETS}],securityGroups=[${AWS_SECURITY_GROUPS}],assignPublicIp=ENABLED}"
 
     #echo "Generar NETWORK_CONFIG seguro con jq"
     #SUBNETS_JSON=$(jq -R -s -c 'split(",")' <<< "$AWS_SUBNETS")
