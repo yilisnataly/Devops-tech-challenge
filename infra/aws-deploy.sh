@@ -1,7 +1,7 @@
 set -e
 
 AWS_REGION=${AWS_REGION}
-ECR_REPO=${ECR_REPO}
+ECR_REPOSITORY=${ECR_REPOSITORY}
 CLUSTER_NAME=${CLUSTER_NAME}
 SERVICE_NAME=${SERVICE_NAME}
 TASK_DEF_NAME=${TASK_DEF_NAME}
@@ -11,8 +11,8 @@ case "$1" in
     echo "[SETUP] Creando/validando recursos básicos en AWS"
 
     echo "Verificando repositorio ECR..."
-    aws ecr describe-repositories --repository-names $ECR_REPO --region $AWS_REGION >/dev/null 2>&1 || \
-    aws ecr create-repository --repository-name $ECR_REPO --region $AWS_REGION
+    aws ecr describe-repositories --repository-names $ECR_REPOSITORY --region $AWS_REGION >/dev/null 2>&1 || \
+    aws ecr create-repository --repository-name $ECR_REPOSITORY --region $AWS_REGION
 
     echo "Verificando cluster ECS..."
     aws ecs describe-clusters --clusters $CLUSTER_NAME --region $AWS_REGION | grep "ACTIVE" >/dev/null 2>&1 || \
