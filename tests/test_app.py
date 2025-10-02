@@ -1,12 +1,12 @@
+import os
+
+os.environ['MYSQL_USER'] = 'test_user'
+os.environ['MYSQL_PASSWORD'] = 'test_pass'
+os.environ['MYSQL_HOST'] = 'localhost'
+os.environ['MYSQL_DB'] = 'test_db'
+
 import pytest
 from cars_api.app import app
-
-@pytest.fixture(autouse=True)
-def fake_env(monkeypatch):
-    monkeypatch.setenv("MYSQL_USER", "test_user")
-    monkeypatch.setenv("MYSQL_PASSWORD", "test_pass")
-    monkeypatch.setenv("MYSQL_HOST", "localhost")
-    monkeypatch.setenv("MYSQL_DB", "test_db")
 
 # ------------------ Fixture de Flask client ------------------
 @pytest.fixture
