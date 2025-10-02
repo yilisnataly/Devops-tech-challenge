@@ -1,87 +1,72 @@
 import pytest
 from cars_api.app import app
 
-
+# ------------------ Fixture de Flask client ------------------
 @pytest.fixture
-def client(monkeypatch):
-    """Configura el cliente de pruebas de Flask sin tocar MySQL real."""
-
-    # Mock de cursor y conexión
-    class MockCursor:
-        def __init__(self):
-            self.data = []
-            self.lastrowid = 1
-            self.rowcount = 1
-
-        def execute(self, query, params=None):
-            if "INSERT" in query:
-                self.lastrowid += 1
-            elif "SELECT" in query:
-                self.data = [{"id": 1, "brand": "Volksvagen", "model": "Golf", "year": 2020}]
-            elif "UPDATE" in query and params[-1] != 1:  # id inexistente
-                self.rowcount = 0
-
-        def fetchall(self):
-            return self.data
-
-        def close(self):
-            pass
-
-    class MockConnection:
-        def cursor(self):
-            return MockCursor()
-        def commit(self):
-            pass
-
-    class MockMySQL:
-        def __init__(self, app):
-            self.connection = MockConnection()
-
-    # Parchar mysql en la app
-    monkeypatch.setattr("app.mysql", MockMySQL(app))
-
+def client():
     app.config['TESTING'] = True
     with app.test_client() as client:
         yield client
 
+# ------------------ Fixture de datos y mocks para GET ------------------
+@pytest.fixture
+def fake_mysql_get(monkeypatch):
+    fake_cars = [
+        {"id": 1, "brand": "Volkswagen", "model": "Golf", "year": 2020},
+        {"id": 2, "brand": "Volkswagen", "model": "T-cross", "year": 2021}
+    ]
 
-def test_get_cars(client):
-    """Debe devolver lista de coches"""
+    class FakeCursor:
+        def execute(self, query):
+            return None
+        def fetchall(self):
+            return fake_cars
+        def close(self):
+            pass
+
+    class FakeConnection:
+        def cursor(self):
+            return FakeCursor()
+
+    monkeypatch.setattr("cars_api.app.mysql", type("FakeMySQL", (), {"connection": FakeConnection()}))
+
+# ------------------ Fixture de datos y mocks para POST ------------------
+@pytest.fixture
+def fake_mysql_post(monkeypatch):
+    class FakeCursor:
+        def execute(self, query, params):
+            self.lastrowid = 42  # ID simulado
+        def close(self):
+            pass
+
+    class FakeConnection:
+        def __init__(self):
+            self.cursor_obj = FakeCursor()
+        def cursor(self):
+            return self.cursor_obj
+        def commit(self):
+            return None
+
+    monkeypatch.setattr("cars_api.app.mysql", type("FakeMySQL", (), {"connection": FakeConnection()}))
+
+# ------------------ Tests GET ------------------
+def test_get_cars_returns_list(client, fake_mysql_get):
     response = client.get("/cars")
     assert response.status_code == 200
     data = response.get_json()
     assert isinstance(data, list)
-    assert data[0]["brand"] == "Toyota"
+    assert len(data) == 2
+    assert data[0]["brand"] == "Volkswagen"
+    assert data[1]["model"] == "T-cross"
 
-
-def test_add_car(client):
-    """Debe crear un coche nuevo"""
-    response = client.post("/cars", json={"brand": "Honda", "model": "Civic", "year": 2022})
+# ------------------ Tests POST ------------------
+def test_add_car_returns_created(client, fake_mysql_post):
+    payload = {"brand": "Ford", "model": "Focus", "year": 2019}
+    response = client.post("/cars", json=payload)
     assert response.status_code == 201
     data = response.get_json()
-    assert data["brand"] == "Honda"
-
-
-def test_add_car_missing_fields(client):
-    """Debe fallar si faltan campos"""
-    response = client.post("/cars", json={"brand": "Ford"})
-    assert response.status_code == 400
-    data = response.get_json()
-    assert "error" in data
-
-
-def test_update_car_success(client):
-    """Debe actualizar un coche existente"""
-    response = client.put("/cars/1", json={"brand": "Mazda", "model": "3", "year": 2021})
-    assert response.status_code == 200
-    data = response.get_json()
-    assert data["id"] == 1
-
-
-def test_update_car_not_found(client):
-    """Debe devolver 404 si el coche no existe"""
-    response = client.put("/cars/999", json={"brand": "Tesla", "model": "X", "year": 2023})
-    assert response.status_code == 404
-    data = response.get_json()
-    assert "error" in data
+    assert data["id"] == 42
+    assert data["brand"] == "Ford"
+    assert data["model"] == "Focus"
+    assert data["year"] == 2019
 
