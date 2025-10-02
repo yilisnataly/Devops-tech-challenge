@@ -34,7 +34,14 @@
           "name": "MYSQL_DB",
           "valueFrom": "arn:aws:secretsmanager:eu-south-2:124678637394:secret:carsdb/credentials:MYSQL_DB::"
         }
-      ]
+      ],
+      "logConfiguration": {
+	"logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/cars-api",
+	  "awslogs-region": "eu-south-2",
+	  "awslogs-stream-prefix": "ecs"
+       }								            }
     }
   ]
 }
