@@ -12,6 +12,7 @@ env:
   ECS_TASK_DEFINITION: ${{ secrets.ECS_TASK_DEFINITION }}
   AWS_SUBNETS: ${{ secrets.AWS_SUBNETS }}
   AWS_SECURITY_GROUPS: ${{ secrets.AWS_SECURITY_GROUPS }}
+  LOG_GROUP: ${{ secrets.LOG_GROUP }}
 
 jobs:
   build-and-deploy:
