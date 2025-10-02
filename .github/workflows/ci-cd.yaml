@@ -40,7 +40,7 @@ jobs:
       - name: Build, tag, and push Docker image
         run: |
           IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:latest"
-          docker build -t $IMAGE_URI .
+          docker build -t $IMAGE_URI -f cars_api/Dockerfile cars_api
           docker push $IMAGE_URI
 
       - name: Deploy to ECS Fargate
