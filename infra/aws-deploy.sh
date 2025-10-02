@@ -20,11 +20,31 @@ case "$1" in
     aws ecs describe-clusters --clusters $CLUSTER_NAME --region $AWS_REGION | grep "ACTIVE" >/dev/null 2>&1 || \
     aws ecs create-cluster --cluster-name $CLUSTER_NAME --region $AWS_REGION
 
+    echo "Verificando grupo de logs CloudWatch..."
+    aws logs describe-log-groups --log-group-name-prefix "$LOG_GROUP" --region $AWS_REGION | grep "$LOG_GROUP" >/dev/null 2>&1 || \
+    aws logs create-log-group --log-group-name "$LOG_GROUP" --region $AWS_REGION
+
     echo "Recursos básicos listos en AWS"
     ;;
 
   deploy)
     echo "[DEPLOY] Registrando definición de tarea y actualizando servicio ECS..."
+
+    if [ -n "$IMAGE_URI" ]; then
+      echo "Usando imagen: $IMAGE_URI"
+      TASK_DEF_JSON=$(jq --arg IMAGE "$IMAGE_URI" \
+        '.containerDefinitions[0].image=$IMAGE |
+	 .containerDefinitions[0].logConfiguration.logDriver="awslogs" |
+	 .containerDefinitions[0].logConfiguration.options={
+           "awslogs-group": "'$LOG_GROUP'",
+           "awslogs-region": "'$AWS_REGION'",
+	   "awslogs-stream-prefix": "ecs"
+	}' infra/ecs-task-def.json)
+      echo "$TASK_DEF_JSON" > infra/ecs-task-def-final.json
+      TASK_DEFINITION_FILE="infra/ecs-task-def-final.json"
+    else
+      TASK_DEFINITION_FILE="infra/ecs-task-def.json"
+    fi
 
     echo "Registrando definición de tarea..."
     ECS_TASK_DEFINITION_ARN=$(aws ecs register-task-definition \
