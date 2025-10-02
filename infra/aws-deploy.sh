@@ -8,10 +8,6 @@ ECS_TASK_DEFINITION=${ECS_TASK_DEFINITION}
 AWS_SUBNETS=${AWS_SUBNETS}
 AWS_SECURITY_GROUPS=${AWS_SECURITY_GROUPS}
 
-# Limpiar posibles espacios y comillas
-#AWS_SUBNETS=$(echo "$AWS_SUBNETS" | tr -d '[:space:]' | tr -d '"' | tr -d '\n' | tr -d '\r')
-#AWS_SECURITY_GROUPS=$(echo "$AWS_SECURITY_GROUPS" | tr -d '[:space:]' | tr -d '"' | tr -d '\n' | tr -d '\r')
-
 case "$1" in
   setup)
     echo "[SETUP] Creando/validando recursos básicos en AWS"
@@ -38,16 +34,16 @@ case "$1" in
       --output text) || { echo "Error registrando la task definition"; exit 1; }
 
     # Limpiar ARN de saltos de línea
-    ECS_TASK_DEFINITION_ARN=$(echo "$ECS_TASK_DEFINITION_ARN" | tr -d '\n' | tr -d '\r')
-    echo "Task definition registrada: $ECS_TASK_DEFINITION_ARN"
+    #ECS_TASK_DEFINITION_ARN=$(echo "$ECS_TASK_DEFINITION_ARN" | tr -d '\n' | tr -d '\r')
+    #echo "Task definition registrada: $ECS_TASK_DEFINITION_ARN"
 
     # Esperar propagación
-    echo "Esperando 5 segundos para propagación de la task definition..."
-    sleep 5
+    #echo "Esperando 5 segundos para propagación de la task definition..."
+    #sleep 5
 
     NETWORK_CONFIG="awsvpcConfiguration={subnets=[${AWS_SUBNETS}],securityGroups=[${AWS_SECURITY_GROUPS}],assignPublicIp=ENABLED}"
 
-    # Verificar servicio ECS
+    echo " Verificar servicio ECS"
     SERVICE_STATUS=$(aws ecs describe-services \
       --cluster "$CLUSTER_NAME" \
       --services "$SERVICE_NAME" \
