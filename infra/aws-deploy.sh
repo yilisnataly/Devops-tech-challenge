@@ -4,7 +4,7 @@ AWS_REGION=${AWS_REGION}
 ECR_REPOSITORY=${ECR_REPOSITORY}
 CLUSTER_NAME=${CLUSTER_NAME}
 SERVICE_NAME=${SERVICE_NAME}
-TASK_DEF_NAME=${TASK_DEF_NAME}
+ECS_TASK_DEFINITION=${ECS_TASK_DEFINITION}
 
 case "$1" in
   setup)
@@ -35,7 +35,7 @@ case "$1" in
       aws ecs update-service \
         --cluster $CLUSTER_NAME \
         --service $SERVICE_NAME \
-        --task-definition $TASK_DEF_NAME \
+        --task-definition $ECS_TASK_DEFINITION \
         --force-new-deployment \
         --region $AWS_REGION
     else
@@ -43,7 +43,7 @@ case "$1" in
       aws ecs create-service \
         --cluster $CLUSTER_NAME \
         --service-name $SERVICE_NAME \
-        --task-definition $TASK_DEF_NAME \
+        --task-definition $ECS_TASK_DEFINITION \
         --desired-count 1 \
         --launch-type FARGATE \
         --network-configuration "awsvpcConfiguration={subnets=[subnet-xxx],securityGroups=[sg-xxx],assignPublicIp=ENABLED}" \
