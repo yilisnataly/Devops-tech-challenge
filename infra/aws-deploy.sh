@@ -1,4 +1,4 @@
-et -e
+set -e
 
 AWS_REGION=${AWS_REGION}
 ECR_REPO=${ECR_REPO}
