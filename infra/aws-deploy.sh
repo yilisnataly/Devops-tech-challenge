@@ -51,7 +51,7 @@ case "$1" in
 
     echo "Registrando definición de tarea..."
     ECS_TASK_DEFINITION_ARN=$(aws ecs register-task-definition \
-      --cli-input-json file://infra/ecs-task-def.json \
+      --cli-input-json file://"$TASK_DEFINITION_FILE" \
       --region "$AWS_REGION" \
       --query 'taskDefinition.taskDefinitionArn' \
       --output text) || { echo "Error registrando la task definition"; exit 1; }
