@@ -33,7 +33,7 @@ case "$1" in
     echo "[DEPLOY] Registrando definición de tarea y actualizando servicio ECS..."
 
     if [ -n "$IMAGE_TAG" ]; then
-      IMAGE_URI="${ECR::::_REPOSITORY}:${IMAGE_TAG}"
+      IMAGE_URI="${ECR_REPOSITORY}:${IMAGE_TAG}"
       echo "Usando imagen: $IMAGE_URI"
       TASK_DEF_JSON=$(jq --arg IMAGE "$IMAGE_URI" \
         '.containerDefinitions[0].image=$IMAGE |
