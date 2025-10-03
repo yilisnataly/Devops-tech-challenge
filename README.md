@@ -110,7 +110,7 @@ Once the server has been started, it is possible to test the features implemente
         "year": 2021
       }
     ```
-## Infrastructure
+## 2️⃣ Infrastructure
 
 All required infrastructure is deployed with a single script:
 
@@ -125,9 +125,9 @@ This ensures:
 - Networking (subnets, security groups)
 - CloudWatch log group creation
 
-## CI/CD Pipeline
+## 3️⃣ Implement CI/CD Pipeline with Github Actions
 
-Pipeline defined in .github/workflows/ci-cd.yml:
+Pipeline defined in (`.github/workflows/ci-cd.yml`):
 
 1. Build & Test
    - Run unit tests with pytest
@@ -141,7 +141,7 @@ Pipeline defined in .github/workflows/ci-cd.yml:
 4. Rollback (manual)
     - Workflow can be re-run with a rollback_tag input
     - Allows deploying a previous container version
-## Testing
+## 4️⃣ Testing
 
 - Unit tests implemented with pytest and pytest-mock
 - Database interactions mocked (no dependency on real DB)
@@ -153,12 +153,12 @@ Pipeline defined in .github/workflows/ci-cd.yml:
   pytest -v
   ```
 
-## Rollback Strategy
+## 5️⃣ Rollback Strategy
 Option A: Manual from GitHub Actions
 
 Re-run the workflow with parameter rollback_tag (e.g., cars-api:abc1234).
 
-## Scalability and Resilience
+## 6️⃣ Scalability and Resilience
 
 For production environments:
 
@@ -168,7 +168,7 @@ For production environments:
 - CloudWatch Alarms: Alert on errors, latency, or failures
 - IAM Roles with least privilege: Security by design
 
-## Monitoring
+## 7️⃣ Monitoring
 
 CloudWatch Logs: Logs available in local console and streamed to **CloudWatch Logs** in AWS
 - Log group: `/ecs/cars-api
@@ -178,8 +178,8 @@ CloudWatch Logs: Logs available in local console and streamed to **CloudWatch Lo
   
 <img width="1073" height="456" alt="Image" src="https://github.com/user-attachments/assets/97ac3daa-980e-4fdc-9816-ecdc056587c2" />
 
-## Security
+## 8️⃣ Security
 
-- AWS Secrets Manager for sensitive credentials
+- AWS Secrets Manager to store database credentials
 - ecsTaskExecutionRole with least privileges
-- No sensitive values exposed in GitHub pipeline
+- No sensitive values exposed in GitHub pipeline; therefore, they are stored as repository secrets 
