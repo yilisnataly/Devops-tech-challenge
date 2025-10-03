@@ -8,6 +8,7 @@ ECS_TASK_DEFINITION=${ECS_TASK_DEFINITION}
 AWS_SUBNETS=${AWS_SUBNETS}
 AWS_SECURITY_GROUPS=${AWS_SECURITY_GROUPS}
 LOG_GROUP=${LOG_GROUP}
+IMAGE_TAG=${ROLLBACK_TAG:-$IMAGE_TAG}
 
 case "$1" in
   setup)
@@ -31,7 +32,8 @@ case "$1" in
   deploy)
     echo "[DEPLOY] Registrando definición de tarea y actualizando servicio ECS..."
 
-    if [ -n "$IMAGE_URI" ]; then
+    if [ -n "$IMAGE_TAG" ]; then
+      IMAGE_URI="${ECR::::_REPOSITORY}:${IMAGE_TAG}"
       echo "Usando imagen: $IMAGE_URI"
       TASK_DEF_JSON=$(jq --arg IMAGE "$IMAGE_URI" \
         '.containerDefinitions[0].image=$IMAGE |
