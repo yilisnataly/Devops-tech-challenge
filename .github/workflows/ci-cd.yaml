@@ -4,6 +4,13 @@ on:
   push:
     branches:
       - main
+
+  workflow_dispatch:
+    inputs:
+      rollback_tag:
+        description: 'Docker image tag to rollback'
+        required: false
+
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
@@ -46,7 +53,14 @@ jobs:
         run: bash infra/aws-deploy.sh setup
 
       - name: Set tag version
-        run: echo "IMAGE_TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
+        run: |
+          if [ -n "${{ github.event.inputs.rollback_tag }}" ]; then
+            echo "Rolling back to tag ${{ github.event.inputs.rollback_tag }}"
+            echo "IMAGE_TAG=${{ github.event.inputs.rollback_tag }}" >> $GITHUB_ENV
+          else
+            echo "Using new commit SHA as tag"
+            echo "IMAGE_TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
+          fi
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
