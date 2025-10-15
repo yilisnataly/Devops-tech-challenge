@@ -15,7 +15,18 @@ The application is a **Cars API** with basic REST endpoints, developed in **Pyth
 
 It runs inside Docker containers and is deployed to AWS via **ECS Fargate**.  
 
-## 1️⃣ Build and containerize a REST API  
+## Tech Stack
+
+- **Language & Framework**: Python 3 + Flask  
+- **Database**: MySQL (credentials managed via AWS Secrets Manager)  
+- **Infrastructure**:  
+  - Docker & Docker Compose (local setup)  
+  - AWS ECR (image registry)  
+  - AWS ECS Fargate (serverless container orchestration)  
+  - AWS CloudWatch Logs (centralized logging)  
+- **CI/CD**: GitHub Actions
+  
+## 1. Build and containerize a REST API  
 
 - Implemented a Flask-based REST API to manage a collection of cars.  
 - Endpoints:  
@@ -110,13 +121,26 @@ Once the server has been started, it is possible to test the features implemente
         "year": 2021
       }
     ```
-## 2️⃣ Infrastructure
+## 2. Infrastructure
 
 All required infrastructure is deployed with a single script:
 
 ```bash
- bash infra/aws-deploy.sh setup
+ infra/aws-deploy.sh
 ```
+This script is structured into two main modes: setup and deploy, allowing it to be executed in different ways depending on the desired action.
+
+setup:
+Prepares and validates the basic AWS resources required by the application, including:
+
+- Checking or creating the ECR repository.
+- Verifying or creating the ECS cluster.
+- Checking or creating the CloudWatch log group.
+
+deploy:
+Handles deployment of the application by:
+- Registering the ECS task definition (optionally updating the container image if IMAGE_TAG is provided).
+- Updating the ECS service with the new task definition.
 
 This ensures:
 
@@ -125,7 +149,7 @@ This ensures:
 - Networking (subnets, security groups)
 - CloudWatch log group creation
 
-## 3️⃣ Implement CI/CD Pipeline with Github Actions
+## 3. Implement CI/CD Pipeline with Github Actions
 
 Pipeline defined in (`.github/workflows/ci-cd.yml`):
 
@@ -141,7 +165,7 @@ Pipeline defined in (`.github/workflows/ci-cd.yml`):
 4. Rollback (manual)
     - Workflow can be re-run with a rollback_tag input
     - Allows deploying a previous container version
-## 4️⃣ Testing
+## 4. Testing
 
 - Unit tests implemented with pytest and pytest-mock
 - Database interactions mocked (no dependency on real DB)
@@ -153,33 +177,54 @@ Pipeline defined in (`.github/workflows/ci-cd.yml`):
   pytest -v
   ```
 
-## 5️⃣ Rollback Strategy
-Option A: Manual from GitHub Actions
+## 5. Rollback Strategy
+Manual rollback from GitHub Actions executing a re-run the workflow with parameter rollback_tag (e.g., cars-api:abc1234).
 
-Re-run the workflow with parameter rollback_tag (e.g., cars-api:abc1234).
+<img width="328" height="255" alt="Image" src="https://github.com/user-attachments/assets/0e3367e2-8ece-485a-b396-be8e82c8bab2" />
 
-## 6️⃣ Scalability and Resilience
+Checking the rollback tag in the logs
+
+<img width="309" height="118" alt="image" src="https://github.com/user-attachments/assets/603a7301-b634-4fcf-9fba-ef4864aefd8f" />
+
+Checking the task definition is taking the correct rollback tag
+
+<img width="383" height="257" alt="Image" src="https://github.com/user-attachments/assets/f9b46b97-d063-463c-a874-cd19e00cf774" />
+
+
+## 6. Scalability and Resilience
 
 For production environments:
 
-- ECS Auto Scaling: Scale tasks based on CPU/Memory usage
-- RDS Multi-AZ: Highly available database setup
-- ALB (Application Load Balancer): Distribute incoming traffic
-- CloudWatch Alarms: Alert on errors, latency, or failures
-- IAM Roles with least privilege: Security by design
+#### ECS Fargate Auto Scaling:
 
-## 7️⃣ Monitoring
+- Configure Service Auto Scaling to increase or decrease containers based on CPU or memory utilization.
+- Enables handling traffic spikes without manual intervention.
+
+#### Multi-AZ Deployment:
+- Create subnets across multiple Availability Zones.
+- Assign subnets to ECS awsvpcConfiguration so that containers are distributed.
+
+#### Load Balancer:
+- Use an Application Load Balancer (ALB) to distribute traffic among tasks.
+- Configure health checks to automatically remove failed tasks.
+
+#### Database Resilience:
+- Use RDS Multi-AZ or Aurora for automatic failover.
+- Daily backups and snapshots for disaster recovery.
+
+#### Observability:
+- CloudWatch Logs + Metrics for monitoring.
+- Alarms on CPU, memory, or HTTP errors.
+
+## 7. Monitoring
 
 CloudWatch Logs: Logs available in local console and streamed to **CloudWatch Logs** in AWS
 - Log group: `/ecs/cars-api
-- High latency
-- ECS task failures
-- 5xx errors from the API
   
 <img width="1073" height="456" alt="Image" src="https://github.com/user-attachments/assets/97ac3daa-980e-4fdc-9816-ecdc056587c2" />
 
-## 8️⃣ Security
+## 8. Security
 
 - AWS Secrets Manager to store database credentials
-- ecsTaskExecutionRole with least privileges
+- (`ecsTaskExecutionRole`) with least privileges
 - No sensitive values exposed in GitHub pipeline; therefore, they are stored as repository secrets 
